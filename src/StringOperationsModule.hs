@@ -128,6 +128,14 @@ getSections :: [String] -> [String]
 getSections [] = []
 getSections (x:(y:ys)) = deleteContentSections ( getLinesBetweenDashes (drop 7 (x:(y:ys))) )	
 
+{-linesToDocument:
+Función que almacena los Strings que están en una lista en un tipo Document.
+
+Esa lista de Strings, al igual que en otras funciones, contendrá la información
+de un artículo. Cada String de la lista será una línea de un archivo de texto de
+un artículo (si es que previamente la lista con Stringsn no ha sido tratada por
+otra función).
+-}
 linesToDocument :: [String] -> Document
 linesToDocument [] = Doc {source = "",
 					  id_document = -1, 
