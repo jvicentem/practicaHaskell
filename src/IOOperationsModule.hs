@@ -24,13 +24,13 @@ String será una dirección del archivo a leer.
 Como salida, devolverá una lista con tipos Document y cada uno tendrá la 
 la información de los archivos que se han leído.
 -}
-readFiles :: [String] -> [Document] -> [Document]
-readFiles [] buffer = buffer
-readFiles (x:xs) buffer = do
-							let text = unsafePerformIO (readEntireFile x)
-							let raw = splitLines text
-							let document = linesToDocument raw
-							readFiles xs (document:buffer)
+readFiles :: [String] -> [Document]
+readFiles [] = []
+readFiles (x:xs) = do
+					let text = unsafePerformIO (readEntireFile x)
+					let raw = splitLines text
+					let document = linesToDocument raw
+					document:readFiles xs 
 
 {- readEntireFile:
 Función que lee un archivo de texto y devuelve un string con todo el contenido
