@@ -20,4 +20,8 @@ instance Show Document where
 			 "Título: " ++ title ++ "\n" ++
 			 "Sections: " ++ show sections ++ "\n" ++
 			 "Abstract: " ++ abstract ++ "\n" ++
-			 "Acrónimos: " ++ show acronyms_list ++ "\n"
+			 "Acrónimos: " ++ show acronyms_list ++ "\n" ++
+			 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" ++ "\n"
+			 
+
+	
