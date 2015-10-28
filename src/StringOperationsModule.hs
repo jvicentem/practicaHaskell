@@ -1,5 +1,5 @@
 
-module StringOperationsModule where
+module StringOperationsModule (splitLines,linesToDocument) where
 
 import Data.List
 import DocumentModule
@@ -9,10 +9,13 @@ import AcronymModule
 Función que obtiene el nombre de la revista en la que está publicado el artículo.
 Realmente obtiene el primer String de la lista de Strings que se le pasa como
 parámetro de entrada.
+
+Algunos nombres de revista tienen un espacio delante, así que se elimina el 
+espacio.
  -}
 getSource :: [String] -> String
 getSource [] = ""
-getSource (x:(y:ys)) = x 
+getSource ((x:xs):(y:ys)) = if x == ' ' then (xs) else (x:xs)
 
 {- getIdDocument:
 Función que obtiene el id del artículo.
@@ -65,6 +68,8 @@ getSections :: [String] -> [String]
 getSections [] = []
 getSections (x:(y:ys)) = deleteContentSections ( getLinesBetweenDashes (drop 7 (x:(y:ys))) )	
 
+
+
 {-linesToDocument:
 Función que almacena los Strings que están en una lista en un tipo Document.
 
@@ -74,7 +79,8 @@ un artículo (si es que previamente la lista con Stringsn no ha sido tratada por
 otra función).
 -}
 linesToDocument :: [String] -> Document
-linesToDocument [] = Doc {source = "",
+linesToDocument [] = Doc {
+					  source = "",
 					  id_document = -1, 
 					  year = -1,
 					  title = "",
@@ -82,7 +88,8 @@ linesToDocument [] = Doc {source = "",
 					  abstract = "",
 					  acronyms_list = []
 					 }								   	
-linesToDocument (x:xs) = Doc {source = getSource (x:xs),
+linesToDocument (x:xs) = Doc {
+						  source = getSource (x:xs),
 					  	  id_document = getIdDocument (x:xs), 
 					  	  year = getYear (x:xs),
 					  	  title = getTitle (x:xs),
@@ -136,7 +143,7 @@ deleteByString string [x] (z:zs) = if x == string then
 deleteByString string (x:(y:ys)) buffer = if x == string then 
 											deleteByString string (y:ys) buffer
 										  else
-							   				deleteByString string (y:ys) (x:buffer)																	 
+							   				deleteByString string (y:ys) (x:buffer)																 
 					   					
 {- deleteContentSections:
 Función que elimina el contenido de las secciones.

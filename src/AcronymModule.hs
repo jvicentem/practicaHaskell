@@ -1,5 +1,5 @@
 
-module AcronymModule where
+module AcronymModule (Acronym(..)) where
 
 data Acronym = Acr {
 					min_list :: [String], -- Contiene los acrónimos

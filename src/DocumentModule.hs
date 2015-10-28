@@ -1,7 +1,7 @@
 
-module DocumentModule where
+module DocumentModule (Document(..)) where
 
-import AcronymModule
+import AcronymModule (Acronym(..))
 
 data Document = Doc { source :: String, -- Nombre de la revista
 					  id_document :: Int, -- Número identificador
@@ -10,9 +10,9 @@ data Document = Doc { source :: String, -- Nombre de la revista
 					  sections :: [String], -- Lista de secciones
 					  abstract :: String, -- 3 primeras líneas del abstract
 					  acronyms_list :: [Acronym] -- Lista de acrónimos
-					} deriving Show
+					} 
 					
-{-instance Show Document where
+instance Show Document where
 	show (Doc source id_document year title sections abstract acronyms_list) =
 		show "Nombre de revista: " ++ source ++ "\n" ++
 			 "Id de artículo: " ++ show id_document ++ "\n" ++
@@ -22,6 +22,4 @@ data Document = Doc { source :: String, -- Nombre de la revista
 			 "Abstract: " ++ abstract ++ "\n" ++
 			 "Acrónimos: " ++ show acronyms_list ++ "\n" ++
 			 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" ++ "\n"
-			 
-
--}
+			
