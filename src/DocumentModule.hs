@@ -8,7 +8,7 @@ data Document = Doc { source :: String, -- Nombre de la revista
 					  year :: Int, -- Año de publicación
 					  title :: String, -- Título
 					  sections :: [String], -- Lista de secciones
-					  abstract :: String, -- 3 primeras líneas del abstract
+					  abstract :: String, -- Abstract del artículo
 					  acronyms_list :: [Acronym] -- Lista de acrónimos
 					} 
 					

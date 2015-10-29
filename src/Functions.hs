@@ -2,7 +2,6 @@
 module Functions where
 
 import Data.List
-import Control.Exception
 import DocumentModule (Document(..))
 import AcronymModule (Acronym(..))
 import IOOperationsModule (readFiles)
@@ -21,13 +20,15 @@ main = do
 		
 		option <- readLn
 		
-		if option > 9 || option < 1 then 
+		if option > 9 || option < 0 then -- OJO CAMBIAR EL option < 0 A option < 1
 			do
 				putStrLn "Opción elegida incorrecta."
 				putStrLn ""
 				main
 		else
 			case option of
+				0 -> do
+						putStrLn (show articles_list)
 				1 -> do
 						putStrLn "Introduce un año: "
 						year <- readLn
