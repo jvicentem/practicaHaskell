@@ -1,5 +1,5 @@
 
-module StringOperationsModule (splitLines,linesToDocument) where
+module StringOperationsModule (splitLines,linesToDocument,getContent) where
 
 import Data.List
 import DocumentModule (Document(..))
@@ -83,7 +83,7 @@ encontrar acrónimos y sus formas expandidas.
 -}
 getContent :: [String] -> [String]
 getContent [] = []
-getContent (x:(y:ys)) = getAbstract (x:(y:ys)) : deleteSectionsTitles ( getLinesBetweenDashes (drop 7 (x:(y:ys))) )
+getContent (x:(y:ys)) = deleteSectionsTitles ( getLinesBetweenDashes (drop 7 (x:(y:ys))) ) ++ [getTitle (x:(y:ys))] ++ [getAbstract (x:(y:ys))] 
 
 {- getAcronyms:
 Función que obtiene todos los acrónimos de un artículo.

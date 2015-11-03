@@ -7,7 +7,7 @@ import AcronymModule (Acronym(..))
 import IOOperationsModule (readFiles)
 
 
-articles_list = readFiles "../papersUTF8"
+articles_list = readFiles "../papersUTF8prueba"
 
 main :: IO ()
 main = do

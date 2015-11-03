@@ -5,7 +5,7 @@ import System.IO.Unsafe
 import System.IO.Error
 import System.Directory
 import System.FilePath
-import StringOperationsModule (splitLines,linesToDocument)
+import StringOperationsModule (splitLines,linesToDocument,getContent)
 import DocumentModule (Document(..))
 
 handler :: IOError -> IO String
