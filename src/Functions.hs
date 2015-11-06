@@ -2,12 +2,12 @@
 module Functions where
 
 import Data.List
-import DocumentModule (Document(..))
+import DocumentModule (Document(..), existsAcronym)
 import AcronymModule (Acronym(..))
 import IOOperationsModule (readFiles)
 
 
-articles_list = readFiles "../papersUTF8prueba"
+articles_list = readFiles "../papersUTF8"
 
 main :: IO ()
 main = do
@@ -17,6 +17,7 @@ main = do
 		putStrLn "Selecciona una opción:"
 		putStrLn "1. Mostrar los títulos de los artículos ordenados alfabéticamente y publicados en un año dado."
 		putStrLn "2. Mostrar el listado de revistas en las que se han publicado los artículos de toda la colección."
+		putStrLn "3. Dado un acrónimo, buscarlo en los diferentes artículos y mostrar los títulos de aquellos que contengan el acŕonimo."
 		
 		option <- readLn
 		
@@ -37,14 +38,29 @@ main = do
 				2 -> do
 						putStrLn (show (sourcesOfArticles articles_list))
 						main			
-				
-articlesByYear :: [Document] -> Int -> [String]
+				3 -> do
+						putStrLn "Introduce un acrónimo: "
+						acronym <- readLn
+						putStrLn (show (articlesWithAcronym articles_list acronym))		
+						main
+
+-- 1				
+articlesByYear :: [Document]->Int -> [String]
 articlesByYear [] _ = []
 articlesByYear (x:xs) yearArticle = if year x == yearArticle then
 										insert (title x) (articlesByYear (xs) yearArticle)
 									else
 										articlesByYear (xs) yearArticle
-
+-- 2
 sourcesOfArticles :: [Document] -> [String]
 sourcesOfArticles [] = []
 sourcesOfArticles (x:xs) = insert (source x) (sourcesOfArticles (xs))
+
+-- 3
+articlesWithAcronym :: [Document]->String -> [String]
+articlesWithAcronym [] _ = []
+articlesWithAcronym _ "" = []
+articlesWithAcronym (x:xs) acronym = if existsAcronym acronym x then
+										insert (title x) (articlesWithAcronym (xs) acronym)
+									 else
+									 	articlesWithAcronym (xs) acronym

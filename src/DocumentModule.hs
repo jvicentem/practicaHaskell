@@ -1,7 +1,7 @@
 
-module DocumentModule (Document(..)) where
+module DocumentModule (Document(..), existsAcronym) where
 
-import AcronymModule (Acronym(..))
+import AcronymModule (Acronym(..), removeCharsForOperations)
 
 data Document = Doc { source :: String, -- Nombre de la revista
 					  id_document :: Int, -- Número identificador
@@ -18,8 +18,11 @@ instance Show Document where
 			 "Id de artículo: " ++ show id_document ++ "\n" ++
 			 "Año de publicación: " ++ show year ++ "\n" ++
 			 "Título: " ++ title ++ "\n" ++
-			 "Sections: " ++ show sections ++ "\n" ++
+			 "Secciones: " ++ show sections ++ "\n" ++
 			 "Abstract: " ++ abstract ++ "\n" ++
 			 "Acrónimos: " ++ show acronyms_list ++ "\n" ++
 			 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" ++ "\n"
-			
+
+existsAcronym :: String->Document -> Bool
+existsAcronym "" _ = False
+existsAcronym acr doc = (length [x|x<-acronyms_list doc, (minAcronym x) == (removeCharsForOperations acr)]) >= 1			
