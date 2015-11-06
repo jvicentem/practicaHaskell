@@ -2,7 +2,7 @@
 module Functions where
 
 import Data.List
-import DocumentModule (Document(..), existsAcronym)
+import DocumentModule (Document(..), existsAcronym, existsAcronymAndSource)
 import AcronymModule (Acronym(..))
 import IOOperationsModule (readFiles)
 
@@ -43,7 +43,13 @@ main = do
 						acronym <- readLn
 						putStrLn (show (articlesWithAcronym articles_list acronym))		
 						main
-
+				4 -> do
+						putStrLn "Introduce el nombre de una revista: "
+						source <- readLn
+						putStrLn "Introduce un acrónimo: "
+						acronym <- readLn
+						putStrLn (show (articlesWithSourceAndAcronym articles_list acronym source))		
+						main
 -- 1				
 articlesByYear :: [Document]->Int -> [String]
 articlesByYear [] _ = []
@@ -64,3 +70,13 @@ articlesWithAcronym (x:xs) acronym = if existsAcronym acronym x then
 										insert (title x) (articlesWithAcronym (xs) acronym)
 									 else
 									 	articlesWithAcronym (xs) acronym
+									 	
+-- 4
+articlesWithSourceAndAcronym :: [Document]->String->String -> [String]
+articlesWithSourceAndAcronym [] _ _ = []
+articlesWithSourceAndAcronym _ "" _ = []
+articlesWithSourceAndAcronym _ _ "" = []
+articlesWithSourceAndAcronym (x:xs) acronym source = if existsAcronymAndSource acronym source x then
+														insert (title x) (articlesWithSourceAndAcronym (xs) acronym source)
+									 				 else
+									 					articlesWithSourceAndAcronym (xs) acronym source									 	
