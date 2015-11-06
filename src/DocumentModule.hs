@@ -1,5 +1,5 @@
 
-module DocumentModule (Document(..), existsAcronym) where
+module DocumentModule (Document(..), existsAcronym, existsAcronymAndSource) where
 
 import AcronymModule (Acronym(..), removeCharsForOperations)
 
@@ -25,4 +25,9 @@ instance Show Document where
 
 existsAcronym :: String->Document -> Bool
 existsAcronym "" _ = False
-existsAcronym acr doc = (length [x|x<-acronyms_list doc, (minAcronym x) == (removeCharsForOperations acr)]) >= 1			
+existsAcronym acr doc = (length [x|x<-acronyms_list doc, (minAcronym x) == (removeCharsForOperations acr)]) >= 1	
+
+existsAcronymAndSource :: String->String->Document -> Bool
+existsAcronymAndSource "" _ _ = False
+existsAcronymAndSource _ "" _ = False
+existsAcronymAndSource acr sourceName doc = (existsAcronym acr doc) && (source doc == sourceName)	
