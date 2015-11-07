@@ -50,6 +50,11 @@ main = do
 						acronym <- readLn
 						putStrLn (show (articlesWithSourceAndAcronym articles_list acronym source))		
 						main
+				5 -> do
+						putStrLn "Introduce un año: "
+						year <- readLn
+						putStrLn (show (meaningsAcronymsFromYear articles_list year))		
+						main						
 -- 1				
 articlesByYear :: [Document]->Int -> [String]
 articlesByYear [] _ = []
@@ -79,4 +84,16 @@ articlesWithSourceAndAcronym _ _ "" = []
 articlesWithSourceAndAcronym (x:xs) acronym source = if existsAcronymAndSource acronym source x then
 														insert (title x) (articlesWithSourceAndAcronym (xs) acronym source)
 									 				 else
-									 					articlesWithSourceAndAcronym (xs) acronym source									 	
+									 					articlesWithSourceAndAcronym (xs) acronym source		
+									 					
+									 					
+-- 5
+meaningsAcronymsFromYear :: [Document]->Int -> [String]
+meaningsAcronymsFromYear [] _ = []
+meaningsAcronymsFromYear (x:xs) yearArticle  =  if year x == yearArticle then
+													insert (string) (meaningsAcronymsFromYear (xs) yearArticle)
+												else
+													meaningsAcronymsFromYear (xs) yearArticle	
+													
+												where
+													string = (title x)++"\n"++(show (acronyms_list x))++"\n"								 												 	
