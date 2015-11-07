@@ -3,7 +3,7 @@ module Functions where
 
 import Data.List
 import DocumentModule (Document(..), existsAcronym, existsAcronymAndSource)
-import AcronymModule (Acronym(..))
+import AcronymModule (Acronym(..), timesAcronyms)
 import IOOperationsModule (readFiles)
 
 
@@ -18,6 +18,9 @@ main = do
 		putStrLn "1. Mostrar los títulos de los artículos ordenados alfabéticamente y publicados en un año dado."
 		putStrLn "2. Mostrar el listado de revistas en las que se han publicado los artículos de toda la colección."
 		putStrLn "3. Dado un acrónimo, buscarlo en los diferentes artículos y mostrar los títulos de aquellos que contengan el acŕonimo."
+		putStrLn "4. Dado el nombre de una revista y un acrónimo, mostrar los títulos de los artículos publicados en dicha revista que contengan el acrónimo."
+		putStrLn "5. Dado un año de publicación, mostrar para cada artículo publicado en ese año el listado de acrónimos que contiene acompañados de sus formas expandidas."
+		putStrLn "6. Dado un identificador de artículo, mostrar un listado de los acrónimos que contiene, acompañado del número de veces que aparece cada acrónimo en el artículo."
 		
 		option <- readLn
 		
@@ -54,7 +57,12 @@ main = do
 						putStrLn "Introduce un año: "
 						year <- readLn
 						putStrLn (show (meaningsAcronymsFromYear articles_list year))		
-						main						
+						main
+				6 -> do
+						putStrLn "Introduce un ID: "
+						idArticle <- readLn
+						putStrLn (show (acronymsFromId articles_list idArticle))		
+						main												
 -- 1				
 articlesByYear :: [Document]->Int -> [String]
 articlesByYear [] _ = []
@@ -85,8 +93,7 @@ articlesWithSourceAndAcronym (x:xs) acronym source = if existsAcronymAndSource a
 														insert (title x) (articlesWithSourceAndAcronym (xs) acronym source)
 									 				 else
 									 					articlesWithSourceAndAcronym (xs) acronym source		
-									 					
-									 					
+									 													 					
 -- 5
 meaningsAcronymsFromYear :: [Document]->Int -> [String]
 meaningsAcronymsFromYear [] _ = []
@@ -96,4 +103,14 @@ meaningsAcronymsFromYear (x:xs) yearArticle  =  if year x == yearArticle then
 													meaningsAcronymsFromYear (xs) yearArticle	
 													
 												where
-													string = (title x)++"\n"++(show (acronyms_list x))++"\n"								 												 	
+													string = (title x)++"\n"++(show (acronyms_list x))++"\n"		
+													
+-- 6
+acronymsFromId :: [Document]->Int -> [String]
+acronymsFromId [] _ = []
+acronymsFromId (x:xs) idArticle = 	if id_document x == idArticle then
+										insert (timesAcronyms (acronyms_list x) (content x)) (acronymsFromId (xs) idArticle)
+									else
+										acronymsFromId (xs) idArticle
+									 
+																												 												 	

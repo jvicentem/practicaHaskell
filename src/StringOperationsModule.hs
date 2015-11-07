@@ -100,7 +100,7 @@ Función que almacena los Strings que están en una lista en un tipo Document.
 
 Esa lista de Strings, al igual que en otras funciones, contendrá la información
 de un artículo. Cada String de la lista será una línea de un archivo de texto de
-un artículo (si es que previamente la lista con Stringsn no ha sido tratada por
+un artículo (si es que previamente la lista con Strings no ha sido tratada por
 otra función).
 -}
 linesToDocument :: [String] -> Document
@@ -111,7 +111,8 @@ linesToDocument [] = Doc {
 					  title = "",
 					  sections = [], 
 					  abstract = "",
-					  acronyms_list = []
+					  acronyms_list = [],
+					  content = []
 					 }								   	
 linesToDocument (x:xs) = Doc {
 						  source = getSource (x:xs),
@@ -120,7 +121,8 @@ linesToDocument (x:xs) = Doc {
 					  	  title = getTitle (x:xs),
 					  	  sections = getSections (x:xs), 
 					  	  abstract = getAbstract (x:xs),
-					  	  acronyms_list = getAcronyms (x:xs) -- Dentro del getAcronyms usaré el getContent
+					  	  acronyms_list = getAcronyms (x:xs), -- Dentro del getAcronyms usaré el getContent
+					  	  content = getContent (x:xs)
 					  	 }			
 
 {- splitLines:
