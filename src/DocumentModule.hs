@@ -9,7 +9,8 @@ data Document = Doc { source :: String, -- Nombre de la revista
 					  title :: String, -- Título
 					  sections :: [String], -- Lista de secciones
 					  abstract :: String, -- Abstract del artículo
-					  acronyms_list :: [Acronym] -- Lista de acrónimos
+					  acronyms_list :: [Acronym], -- Lista de acrónimos
+					  content :: [String]
 					} 
 					
 instance Show Document where

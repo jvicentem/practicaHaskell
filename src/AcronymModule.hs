@@ -1,5 +1,5 @@
 
-module AcronymModule (Acronym(..), getListOfAcronyms, removeCharsForOperations) where
+module AcronymModule (Acronym(..), getListOfAcronyms, removeCharsForOperations, timesAcronyms) where
 
 import Data.List
 import Data.Char
@@ -23,7 +23,6 @@ de un artículo.
 El primer parámetro es una lista de String y cada String es una línea de contenido
 del artículo.
 -}
-
 getListOfAcronyms :: [String] -> [Acronym]
 getListOfAcronyms [] = []
 getListOfAcronyms (x:xs) = getAcronymsWithMeaning (x:xs)
@@ -79,7 +78,7 @@ getMeaningForAcronym :: String->[String]->Int -> [String]
 getMeaningForAcronym "" _ _ = []
 getMeaningForAcronym _ [] _ = []
 getMeaningForAcronym acr (x:xs) positionAcr = 
-		getMeaningForAcronymImpl acr (x:xs) positionAcr []
+							getMeaningForAcronymImpl acr (x:xs) positionAcr []
 
 getMeaningForAcronymImpl :: String->[String]->Int->[String] -> [String]
 getMeaningForAcronymImpl _ [] _ buffer = buffer
@@ -93,7 +92,6 @@ getMeaningForAcronymImpl acr@(x:xs) wordsList@(y:ys) positionAcr buffer =
 							 --    ++
 							 --   (criterion4 acr (y:ys) positionAcr)
 												   				
-	
 {- isAcronym
 Función que comprueba si un String es un acrónimo o no.
 
@@ -482,7 +480,35 @@ checkWord (x:xs) (y:ys) = if x == y then
 							checkWord (xs) (ys)
 						  else
 						  	checkWord (x:xs) (ys) 
-					  	
+
+{- El segundo argumento es un array y cada posición tiene un String que es 
+cada línea del contenido del acŕonimo.
+-}									
+timesAcronyms :: [Acronym]->[String] -> [(String,Int)]
+timesAcronyms [] _ = []
+timesAcronyms _ [] = []
+timesAcronyms (x:xs) (y:ys) = timesAcronymsImpl (x:xs) linesToWords 
+							  where 
+							  	linesToWords = concat (map (\a -> words a ) (y:ys))
+
+{- El segundo argumento es un array y cada posición tiene un String que es cada
+palabra del contenido del acrónimo.
+-}
+timesAcronymsImpl :: [Acronym]->[String] -> [(String,Int)]
+timesAcronymsImpl [] _ = []
+timesAcronymsImpl _ [] = []
+timesAcronymsImpl (x:xs) wordsArticle@(y:ys) = 
+					(timesOneAcronym (x) wordsArticle 0)
+					:
+					(timesAcronymsImpl (xs) wordsArticle)
+					
+timesOneAcronym :: Acronym->[String]->Int -> (String,Int)
+timesOneAcronym acr [] i = (minAcronym acr,i)
+timesOneAcronym acr (y:ys) i = if ((minAcronym acr) == y) || ((minAcronym acr) == (cleanWord y)) then
+								timesOneAcronym acr (ys) (i+1)
+							   else
+							   	timesOneAcronym acr (ys) i				
+							  	
 {- Las palabras tienen que ser seguidas. Si hay una que no tiene la siguiente
 letra del acrónimo que toca, se descartan las N últimas palabras analizadas.-}		
 {-				  	
