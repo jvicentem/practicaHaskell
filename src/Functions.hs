@@ -2,7 +2,7 @@
 module Functions where
 
 import Data.List
-import DocumentModule (Document(..), existsAcronym, existsAcronymAndSource)
+import DocumentModule (Document(..), existsAcronym, existsAcronymAndSource, noAcronyms)
 import AcronymModule (Acronym(..), timesAcronyms)
 import IOOperationsModule (readFiles)
 
@@ -21,6 +21,7 @@ main = do
 		putStrLn "4. Dado el nombre de una revista y un acrónimo, mostrar los títulos de los artículos publicados en dicha revista que contengan el acrónimo."
 		putStrLn "5. Dado un año de publicación, mostrar para cada artículo publicado en ese año el listado de acrónimos que contiene acompañados de sus formas expandidas."
 		putStrLn "6. Dado un identificador de artículo, mostrar un listado de los acrónimos que contiene, acompañado del número de veces que aparece cada acrónimo en el artículo."
+		putStrLn "7. Mostrar los títulos e identificador de todos aquellos artículos que no contengan ningún acrónimo."
 		
 		option <- readLn
 		
@@ -62,7 +63,10 @@ main = do
 						putStrLn "Introduce un ID: "
 						idArticle <- readLn
 						putStrLn (show (acronymsFromId articles_list idArticle))		
-						main												
+						main	
+				7 -> do
+						putStrLn (show (articlesWithoutAcronyms articles_list))		
+						main																		
 -- 1				
 articlesByYear :: [Document]->Int -> [String]
 articlesByYear [] _ = []
@@ -106,11 +110,25 @@ meaningsAcronymsFromYear (x:xs) yearArticle  =  if year x == yearArticle then
 													string = (title x)++"\n"++(show (acronyms_list x))++"\n"		
 													
 -- 6
-acronymsFromId :: [Document]->Int -> [String]
+acronymsFromId :: [Document]->Int -> [(String,Int)]
 acronymsFromId [] _ = []
 acronymsFromId (x:xs) idArticle = 	if id_document x == idArticle then
-										insert (timesAcronyms (acronyms_list x) (content x)) (acronymsFromId (xs) idArticle)
+										timesAcronyms (acronyms_list x) (content x)
 									else
 										acronymsFromId (xs) idArticle
+										
+										
+-- 7
+articlesWithoutAcronyms :: [Document] -> [(Int,String)]
+articlesWithoutAcronyms [] = []						
+articlesWithoutAcronyms (x:xs) = articlesWithoutAcronymsImpl (x:xs) []
+
+articlesWithoutAcronymsImpl :: [Document]->[(Int,String)] -> [(Int,String)]
+articlesWithoutAcronymsImpl [] [] = []
+articlesWithoutAcronymsImpl [] buffer = buffer
+articlesWithoutAcronymsImpl (x:xs) buffer = if noAcronyms x then 
+												articlesWithoutAcronymsImpl (xs) ( (id_document x, title x):buffer)		
+											else
+												articlesWithoutAcronymsImpl (xs) buffer		
 									 
 																												 												 	
