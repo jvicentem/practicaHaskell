@@ -22,6 +22,7 @@ main = do
 		putStrLn "5. Dado un año de publicación, mostrar para cada artículo publicado en ese año el listado de acrónimos que contiene acompañados de sus formas expandidas."
 		putStrLn "6. Dado un identificador de artículo, mostrar un listado de los acrónimos que contiene, acompañado del número de veces que aparece cada acrónimo en el artículo."
 		putStrLn "7. Mostrar los títulos e identificador de todos aquellos artículos que no contengan ningún acrónimo."
+		putStrLn "8. Dado el nombre de una revista, mostrar toda la información de los artículos publicados en dicha revista."
 		
 		option <- readLn
 		
@@ -66,7 +67,12 @@ main = do
 						main	
 				7 -> do
 						putStrLn (show (articlesWithoutAcronyms articles_list))		
-						main																		
+						main	
+				8 -> do
+						putStrLn "Introduce el nombre de una revista: "
+						source <- readLn
+						putStrLn (show (articlesFromSource articles_list source))		
+						main																							
 -- 1				
 articlesByYear :: [Document]->Int -> [String]
 articlesByYear [] _ = []
@@ -130,5 +136,17 @@ articlesWithoutAcronymsImpl (x:xs) buffer = if noAcronyms x then
 												articlesWithoutAcronymsImpl (xs) ( (id_document x, title x):buffer)		
 											else
 												articlesWithoutAcronymsImpl (xs) buffer		
+												
+-- 8
+articlesFromSource :: [Document]->String -> [Document]
+articlesFromSource [] _ = []
+articlesFromSource (x:xs) sourceArticles = articlesFromSourceImpl (x:xs) sourceArticles []
+
+articlesFromSourceImpl :: [Document]->String->[Document] -> [Document]
+articlesFromSourceImpl [] _ buffer = buffer
+articlesFromSourceImpl (x:xs) sourceArticles buffer = if source x == sourceArticles then
+														articlesFromSourceImpl (xs) sourceArticles (x:buffer)
+												  	  else
+												  		articlesFromSourceImpl (xs) sourceArticles buffer												
 									 
 																												 												 	
