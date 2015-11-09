@@ -5,6 +5,7 @@ import Data.List
 import DocumentModule (Document(..), existsAcronym, existsAcronymAndSource, noAcronyms)
 import AcronymModule (Acronym(..), timesAcronyms)
 import IOOperationsModule (readFiles)
+import ClusterModule (Cluster(..), groupArticles, createEmptyCluster)
 
 
 articles_list = readFiles "../papersUTF8"
@@ -23,6 +24,7 @@ main = do
 		putStrLn "6. Dado un identificador de artículo, mostrar un listado de los acrónimos que contiene, acompañado del número de veces que aparece cada acrónimo en el artículo."
 		putStrLn "7. Mostrar los títulos e identificador de todos aquellos artículos que no contengan ningún acrónimo."
 		putStrLn "8. Dado el nombre de una revista, mostrar toda la información de los artículos publicados en dicha revista."
+		putStrLn "9. Agrupar artículos por acrónimos."
 		
 		option <- readLn
 		
@@ -72,7 +74,10 @@ main = do
 						putStrLn "Introduce el nombre de una revista: "
 						source <- readLn
 						putStrLn (show (articlesFromSource articles_list source))		
-						main																							
+						main	
+				9 -> do
+						putStrLn (show (clusterArticles articles_list))		
+						main																												
 -- 1				
 articlesByYear :: [Document]->Int -> [String]
 articlesByYear [] _ = []
@@ -149,4 +154,7 @@ articlesFromSourceImpl (x:xs) sourceArticles buffer = if source x == sourceArtic
 												  	  else
 												  		articlesFromSourceImpl (xs) sourceArticles buffer												
 									 
-																												 												 	
+-- 9
+clusterArticles :: [Document] -> (Cluster,[Cluster])
+clusterArticles [] = (createEmptyCluster,[])
+clusterArticles (x:xs) = groupArticles (x:xs)																										 												 	
