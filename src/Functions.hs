@@ -8,7 +8,7 @@ import IOOperationsModule (readFiles)
 import ClusterModule (Cluster(..), groupArticles, createEmptyCluster)
 
 
-articles_list = readFiles "../papersUTF8"
+articles_list = readFiles "../papersUTF8prueba"
 
 main :: IO ()
 main = do

@@ -15,20 +15,20 @@ data Document = Doc { source :: String, -- Nombre de la revista
 					
 instance Show Document where
 	show (Doc source id_document year title sections abstract acronyms_list content) =
-		{-show "Nombre de revista: " ++ source ++ "\n" ++
+		show "Nombre de revista: " ++ source ++ "\n" ++
 			 "Id de artículo: " ++ show id_document ++ "\n" ++
 			 "Año de publicación: " ++ show year ++ "\n" ++
 			 "Título: " ++ title ++ "\n" ++
 			 "Secciones: " ++ show sections ++ "\n" ++
 			 "Abstract: " ++ abstract ++ "\n" ++
 			 "Acrónimos: " ++ show acronyms_list ++ "\n" ++
-			 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" ++ "\n"-}
-		show "---------------" ++ "\n" ++
+			 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" ++ "\n"
+		{-show "---------------" ++ "\n" ++
 			 "Title: " ++ title ++ " (" ++ (show year) ++ ")" ++ "\n" ++
 			 "Abstract: " ++ abstract ++ "\n" ++ 
 			 "Section number: " ++ show (length sections) ++ "\n" ++ 
-			 "Sections: " ++ unlines sections ++ "\n" ++
-			 "---------------" ++ "\n"
+			 "Sections: " ++ "\n" ++ unlines sections ++ "\n" ++
+			 "---------------" ++ "\n" -}
 
 existsAcronym :: String->Document -> Bool
 existsAcronym "" _ = False
