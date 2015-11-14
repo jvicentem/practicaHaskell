@@ -58,7 +58,7 @@ getAcronymsWithMeaningImpl wordsList@(x:xs) positionAcr originalWordsList buffer
  	getAcronymsWithMeaningImpl (xs) (positionAcr+1) originalWordsList buffer
  
    where 
-		cleanedAcronym = cleanWord x -- Se quitan los paréntesis del acrónimo		
+		cleanedAcronym = cleanWord2 x -- Se quitan los paréntesis del acrónimo		
 
 
 getMeaningForAcronym :: String->[String]->Int -> String
@@ -489,17 +489,35 @@ timesAcronymsImpl :: [Acronym]->[String] -> [(String,Int)]
 timesAcronymsImpl [] _ = []
 timesAcronymsImpl _ [] = []
 timesAcronymsImpl (x:xs) wordsArticle@(y:ys) = 
-					(timesOneAcronym (x) wordsArticle 0)
+					(timesOneAcronym (x) wordsArticle 1)
 					:
 					(timesAcronymsImpl (xs) wordsArticle)
 					
 timesOneAcronym :: Acronym->[String]->Int -> (String,Int)
 timesOneAcronym acr [] i = (minAcronym acr,i)
-timesOneAcronym acr (y:ys) i = if ((minAcronym acr) == y) || ((minAcronym acr) == (cleanWord y)) then
+timesOneAcronym acr (y:ys) i = if ((minAcronym acr) == y) || ((minAcronym acr) == (cleanWord2 y)) then
 								timesOneAcronym acr (ys) (i+1)
 							   else
 							   	timesOneAcronym acr (ys) i				
-							  	
+
+cleanWord2 :: String -> String
+cleanWord2 [] = []
+cleanWord2 (x:xs) = 
+					removeCharacter ';'(
+						removeCharacter ':' (
+							removeCharacter ',' (
+								removeCharacter '.' (
+									removeCharacter ']'(
+				   						removeCharacter '[' (
+											removeCharacter ')' (
+												removeCharacter '(' (x:xs)
+											)
+										)							
+				   					)
+				   				)	
+				   			)	
+				   		)					
+				   	)  	
 {- Las palabras tienen que ser seguidas. Si hay una que no tiene la siguiente
 letra del acrónimo que toca, se descartan las N últimas palabras analizadas.-}		
 {-				  	
