@@ -8,7 +8,7 @@ import IOOperationsModule (readFiles)
 import ClusterModule (Cluster(..), groupArticles, createEmptyCluster)
 
 
-articles_list = readFiles "../papersUTF8prueba"
+articles_list = readFiles "../papersUTF8"
 
 main :: IO ()
 main = do
@@ -118,7 +118,7 @@ meaningsAcronymsFromYear (x:xs) yearArticle  =  if year x == yearArticle then
 													meaningsAcronymsFromYear (xs) yearArticle	
 													
 												where
-													string = (title x)++"\n"++(show (acronyms_list x))++"\n"		
+													string = (title x) ++ " --> " ++ (show (acronyms_list x)) ++ "\n"		
 													
 -- 6
 acronymsFromId :: [Document]->Int -> [(String,Int)]

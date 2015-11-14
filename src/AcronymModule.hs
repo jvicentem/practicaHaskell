@@ -6,7 +6,7 @@ import Data.Char
 
 data Acronym = Acr {
 					minAcronym :: String, -- Contiene el acrónimo
-					maxAcronym :: [String] -- Contiene la forma expandida
+					maxAcronym :: String -- Contiene la forma expandida
 					}
 					
 instance Show Acronym where
@@ -61,25 +61,30 @@ getAcronymsWithMeaningImpl wordsList@(x:xs) positionAcr originalWordsList buffer
 		cleanedAcronym = cleanWord x -- Se quitan los paréntesis del acrónimo		
 
 
-getMeaningForAcronym :: String->[String]->Int -> [String]
+getMeaningForAcronym :: String->[String]->Int -> String
 getMeaningForAcronym "" _ _ = []
 getMeaningForAcronym _ [] _ = []
 getMeaningForAcronym acr (x:xs) positionAcr = 
-							getMeaningForAcronymImpl acr (x:xs) positionAcr []
+							getMeaningForAcronymImpl acr (x:xs) positionAcr
 
-getMeaningForAcronymImpl :: String->[String]->Int->[String] -> [String]
-getMeaningForAcronymImpl _ [] _ buffer = buffer++[" -> <- "]
-getMeaningForAcronymImpl "" _ _ _ = []
-getMeaningForAcronymImpl acr@(x:xs) wordsList@(y:ys) positionAcr buffer = meanings
-				--getMeaningForAcronymImpl acr (ys) (positionAcr+1) (meanings++buffer) 
-				where
-					meanings = 
-							-- (criterion1 acr (y:ys) positionAcr)
-						 	-- (criterion2 acr (y:ys) positionAcr)
-							-- 	++
-							--  (criterion3 acr (y:ys) positionAcr)
-							 --    ++
-							    (criterion4 acr (y:ys) positionAcr)
+getMeaningForAcronymImpl :: String->[String]->Int -> String
+getMeaningForAcronymImpl _ [] _ = []
+getMeaningForAcronymImpl "" _ _ = []
+getMeaningForAcronymImpl acr@(x:xs) wordsList@(y:ys) positionAcr =
+	if meanings1 /= [] then
+		last meanings1
+	else
+		if meanings3 /= [] then
+			last meanings3
+		else
+			if meanings4 /= [] then
+				last meanings4
+			else []
+	where
+		meanings1 = criterion1 acr (y:ys) positionAcr
+		meanings3 = criterion3 acr (y:ys) positionAcr
+		meanings4 = criterion4 acr (y:ys) positionAcr
+
 												   				
 {- isAcronym
 Función que comprueba si un String es un acrónimo o no.
