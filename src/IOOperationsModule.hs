@@ -5,8 +5,8 @@ import System.IO.Unsafe
 import System.IO.Error
 import System.Directory
 import System.FilePath
-import StringOperationsModule (splitLines,linesToDocument,getContent)
-import DocumentModule (Document(..))
+import StringOperationsModule (splitLines, getContent)
+import DocumentModule (Document(..), linesToDocument)
 
 handler :: IOError -> IO String
 handler e  = if isDoesNotExistError e then
@@ -21,7 +21,6 @@ handler e  = if isDoesNotExistError e then
 {- readFiles:
 Función que lee todos los archivos de texto incluidos en el directorio que se 
 pasa como primer parámetro de entrada.
-
 Como salida, devolverá una lista con tipos Document y cada uno tendrá la 
 la información de los archivos que se han leído.
 -}
@@ -45,7 +44,7 @@ del mismo.
 readEntireFile :: String -> IO String
 readEntireFile directory = catchIOError (readFile directory) handler
 
-{- getPaths
+{- getPaths:
 A partir de un path de una carpeta, obtiene todas las rutas de archivos
 contenidos en ella.
 -}
