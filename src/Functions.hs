@@ -118,7 +118,7 @@ meaningsAcronymsFromYear (x:xs) yearArticle  =  if year x == yearArticle then
 													meaningsAcronymsFromYear (xs) yearArticle	
 													
 												where
-													string = (title x)++"\n"++(show (acronyms_list x))++"\n"		
+													string = (title x) ++ " --> " ++ (show (acronyms_list x)) ++ "\n"		
 													
 -- 6
 acronymsFromId :: [Document]->Int -> [(String,Int)]

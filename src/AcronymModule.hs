@@ -6,7 +6,7 @@ import Data.Char
 
 data Acronym = Acr {
 					minAcronym :: String, -- Contiene el acrónimo
-					maxAcronym :: [String] -- Contiene la forma expandida
+					maxAcronym :: String -- Contiene la forma expandida
 					}
 					
 instance Show Acronym where
@@ -41,19 +41,6 @@ getAcronymsWithMeaning (x:xs) =  removeDuplicatedAcronyms (
 						   		 )
 						   		
 						   		 where lineToWords = words x
-
-{-getAcronymsWithoutMeaningImpl :: [String] -> [Acronym]
-getAcronymsWithoutMeaningImpl [] = []
-getAcronymsWithoutMeaningImpl (x:xs) = 
-   if isAcronym xWithoutWeirdCharacters then
-	(Acr {minAcronym = xWithoutWeirdCharacters, maxAcronym=[""]})
-	:
-	(getAcronymsWithoutMeaningImpl (xs))
-   else
- 	getAcronymsWithoutMeaningImpl (xs)
- 
-   where
- 	xWithoutWeirdCharacters = cleanWord x -}
  	
 getAcronymsWithMeaningImpl :: [String]->Int->[String]->[Acronym] -> [Acronym]
 getAcronymsWithMeaningImpl [] _ [] _ = []
@@ -71,26 +58,35 @@ getAcronymsWithMeaningImpl wordsList@(x:xs) positionAcr originalWordsList buffer
  	getAcronymsWithMeaningImpl (xs) (positionAcr+1) originalWordsList buffer
  
    where 
-		cleanedAcronym = cleanWord x -- Se quitan los paréntesis del acrónimo		
+		cleanedAcronym = removeCharsForOperations x -- Se quitan los paréntesis del acrónimo		
 
-
-getMeaningForAcronym :: String->[String]->Int -> [String]
+{- getMeaningForAcronym
+Función que obtiene un significado para un acrónimo.
+-}
+getMeaningForAcronym :: String->[String]->Int -> String
 getMeaningForAcronym "" _ _ = []
 getMeaningForAcronym _ [] _ = []
 getMeaningForAcronym acr (x:xs) positionAcr = 
-							getMeaningForAcronymImpl acr (x:xs) positionAcr []
+							getMeaningForAcronymImpl acr (x:xs) positionAcr
 
-getMeaningForAcronymImpl :: String->[String]->Int->[String] -> [String]
-getMeaningForAcronymImpl _ [] _ buffer = buffer
-getMeaningForAcronymImpl "" _ _ _ = []
-getMeaningForAcronymImpl acr@(x:xs) wordsList@(y:ys) positionAcr buffer =
-				getMeaningForAcronymImpl acr (ys) (positionAcr+1) (meanings++buffer) 
-				where
-					meanings = -- (criterion2 acr (y:ys) positionAcr)
-							-- 	++
-							   (criterion3 acr (y:ys) positionAcr)
-							 --    ++
-							 --   (criterion4 acr (y:ys) positionAcr)
+getMeaningForAcronymImpl :: String->[String]->Int -> String
+getMeaningForAcronymImpl _ [] _ = []
+getMeaningForAcronymImpl "" _ _ = []
+getMeaningForAcronymImpl acr@(x:xs) wordsList@(y:ys) positionAcr =
+	if meanings1 /= [] then
+		last meanings1
+	else
+		if meanings3 /= [] then
+			last meanings3
+		else
+			if meanings4 /= [] then
+				last meanings4
+			else []
+	where
+		meanings1 = criterion1 acr (y:ys) positionAcr
+		meanings3 = criterion3 acr (y:ys) positionAcr
+		meanings4 = criterion4 acr (y:ys) positionAcr
+
 												   				
 {- isAcronym
 Función que comprueba si un String es un acrónimo o no.
@@ -194,6 +190,9 @@ removeCharacter char@_ (x:xs) = if x == char then
 								else 
 									x:removeCharacter char (xs)
 
+{- replaceCharacter
+Función que reemplaza un carácter por otro.
+-}
 replaceCharacter :: Char->Char->String -> String
 replaceCharacter _ _ [] = []
 replaceCharacter char1@_ char2@_ (x:xs) = if x == char1 then
@@ -217,7 +216,29 @@ cleanWord (x:xs) = removeCharacter ']'(
 							)
 						)							
 				   	)
-				   	
+
+{- removeCharsForOperations
+Función que elimina ciertos caracteres de una palabra. Elimina más caracteres 
+que la función cleanWord-}
+removeCharsForOperations :: String -> String
+removeCharsForOperations [] = []
+removeCharsForOperations (x:xs) = 
+					removeCharacter ';'(
+						removeCharacter ':' (
+							removeCharacter ',' (
+								removeCharacter '.' (
+									removeCharacter ']'(
+				   						removeCharacter '[' (
+											removeCharacter ')' (
+												removeCharacter '(' (x:xs)
+											)
+										)							
+				   					)
+				   				)	
+				   			)	
+				   		)					
+				   	)  			
+					  					   	
 {- validWord
 
 Función que determina si una palabra es válida o no para formar parte de un 
@@ -253,53 +274,16 @@ Función que elimina los acrónimos duplicados de una lista de acrónimos.
 -}									
 removeDuplicatedAcronyms :: [Acronym] -> [Acronym]
 removeDuplicatedAcronyms [] = []
-removeDuplicatedAcronyms (x:xs) = nub (x:xs)
+removeDuplicatedAcronyms (x:xs) = nub (x:xs)								 
 
-{- findMeaningsForAcronyms
-
-findMeaningsForAcronyms :: [Acronym]->[String]-> [Acronym]
-findMeaningsForAcronyms [] _ = []
-findMeaningsForAcronyms _ [] = []
-findMeaningsForAcronyms (x:xs) (y:ys) = findMeaningsForAcronymsImpl (x:xs) (y:ys) 
-
-findMeaningsForAcronymsImpl :: [Acronym]->[String] -> [Acronym]
-findMeaningsForAcronymsImpl [] _  = []
-findMeaningsForAcronymsImpl _ []  = []
-findMeaningsForAcronymsImpl (x:xs)(y:ys) = (findMeaningForAcronym (y:ys) x []):findMeaningsForAcronymsImpl (xs) (y:ys)
+{- realAcronymLength
+Función que mide la longitud real de un acrónimo.
 -}
-{- findMeaningAcronym
-Encuentra el significado de un acrónimo. 
-
-Como parámetro de entrada se le pasa a la función en primer lugar una lista
-de Strings (cada String es una línea del contenido del artículo).
-							
-findMeaningForAcronym :: [String]->Acronym->[String]-> Acronym
-findMeaningForAcronym [] acr@(Acr minAcronym maxAcronym) buffer = Acr {minAcronym=minAcronym,maxAcronym=buffer}
-findMeaningForAcronym (x:xs) acr@(Acr minAcronym maxAcronym) buffer = 
-													findMeaningForAcronym (xs) acr (meanings++buffer) 
-													where
-														meanings = (criterion2 minAcronym x)++(criterion3 minAcronym x)++(criterion4 minAcronym x)
--}								 
-
 realAcronymLength :: String -> Int
 realAcronymLength "" = 0
-realAcronymLength (x:xs) = length (removeCharsForOperations (x:xs))  		
-				
-removeCharsForOperations :: String -> String
-removeCharsForOperations "" = ""
-removeCharsForOperations (x:xs) = 
-			removeCharacter ';' (
-				removeCharacter ':' (
-					removeCharacter '.'(
-					   	removeCharacter ',' (
-							removeCharacter ')' (
-								removeCharacter '(' (x:xs)
-								)
-							)							
-				   	)
-				 )
-			)						   			  
-			 
+realAcronymLength (x:xs) = length (removeCharsForOperations (x:xs))  					
+						   			  
+-- Sólo las iniciales			 
 criterion2 :: String->[String]->Int -> [String]
 criterion2 "" _ _ = [""]
 criterion2 _ [] _ = [""]
@@ -308,14 +292,23 @@ criterion2 acronym (x:xs) positionAcr = criterion2Impl acronymCleaned (x:xs) [] 
 
 criterion2Impl :: String->[String]->[String]->Int->Int->String -> [String]
 criterion2Impl "" _ _ _ _ "" = []
-criterion2Impl "" (y:ys) buffer acrPos i originalAcr = (filter (/="") [intercalate " " (reverse buffer)])
-														++
-														criterion2Impl originalAcr (y:ys) [] acrPos i originalAcr
-criterion2Impl "" [] buffer _ _ _ = filter (/="") [intercalate " " (reverse buffer)]
+criterion2Impl "" (y:ys) buffer acrPos i originalAcr = 	if length buffer == length originalAcr then
+															(nub (filter (/="") [intercalate " " (reverse buffer)]))
+															++
+															criterion2Impl originalAcr (y:ys) [] acrPos i originalAcr
+														else 
+															criterion2Impl originalAcr (y:ys) [] acrPos i originalAcr
+
+
+
+criterion2Impl "" [] buffer _ _ originalAcr = if length buffer == length originalAcr then
+												nub (filter (/="") [intercalate " " (reverse buffer)])
+											  else 
+												[]
 criterion2Impl _ [] _ _ _ _ = []
 criterion2Impl (x:xs) (y:ys) buffer acrPos i originalAcr = 
 	if i < acrPos then
-		if (x == head y) then
+		if (x == (toLower (head y))) then
 			if not wordWeirdChar then
 				criterion2Impl (xs) (ys) (y:buffer) acrPos (i+1) originalAcr
 			else
@@ -324,14 +317,18 @@ criterion2Impl (x:xs) (y:ys) buffer acrPos i originalAcr =
 				else
 					criterion2Impl originalAcr (ys) [] acrPos (i+1) originalAcr
 		else
-			criterion2Impl (x:xs) (ys) [] acrPos (i+1) originalAcr
+			criterion2Impl originalAcr (ys) [] acrPos (i+1) originalAcr
 	else
-		filter (/="") [intercalate " " (reverse buffer)]
+		if length buffer == length originalAcr then
+			nub (filter (/="") [intercalate " " (reverse buffer)])
+		else 
+			[]
 				
 	where 
 		lastChar = last y
 		wordWeirdChar = lastChar == '.' || lastChar == ',' || lastChar == ';' || lastChar == ':'		  
 
+-- Las iniciales y una palabra en el medio
 criterion1 :: String->[String]->Int -> [String]
 criterion1 "" _ _ = [""]
 criterion1 _ [] _ = [""]
@@ -340,32 +337,42 @@ criterion1 acronym (x:xs) positionAcr = criterion1Impl acronymCleaned (x:xs) [] 
 
 criterion1Impl :: String->[String]->[String]->Int->Int->String->Bool -> [String]
 criterion1Impl "" _ _ _ _ "" _ = []
-criterion1Impl "" (y:ys) buffer acrPos i originalAcr _ = (filter (/="") [intercalate " " (reverse buffer)])
-														++
-														criterion1Impl originalAcr (y:ys) [] acrPos i originalAcr False
-criterion1Impl "" [] buffer _ _ _ _ = filter (/="") [intercalate " " (reverse buffer)]
+criterion1Impl "" (y:ys) buffer acrPos i originalAcr _ = if (length buffer == length originalAcr) || (length buffer == (length originalAcr)+1) then
+															(nub (filter (/="") [intercalate " " (reverse buffer)]))
+															++
+															criterion1Impl originalAcr (y:ys) [] acrPos i originalAcr False
+														 else
+														 	criterion1Impl originalAcr (y:ys) [] acrPos i originalAcr False
+criterion1Impl "" [] buffer _ _ originalAcr _ = if (length buffer == length originalAcr) || (length buffer == (length originalAcr)+1) then
+													nub (filter (/="") [intercalate " " (reverse buffer)])
+									  			else 
+													[]
 criterion1Impl _ [] _ _ _ _ _ = []
 criterion1Impl (x:xs) (y:ys) buffer acrPos i originalAcr alreadyWordInMiddle = 
 	if i < acrPos then
-		if (x == head y) then
+		if (x == (toLower (head y))) then
 			if not wordWeirdChar then
 				criterion1Impl (xs) (ys) (y:buffer) acrPos (i+1) originalAcr alreadyWordInMiddle
 			else
 				if (length (x:xs) == 1) then
 					criterion1Impl (xs) (ys) (y:buffer) acrPos (i+1) originalAcr alreadyWordInMiddle
 				else
-					criterion1Impl originalAcr (ys) [] acrPos (i+1) originalAcr False
+					criterion1Impl originalAcr (ys) [] acrPos (i+1) originalAcr False 
 		else
 			if (not alreadyWordInMiddle) && (not wordWeirdChar) && (length buffer >= 1) then
 				criterion1Impl (x:xs) (ys) (y:buffer) acrPos (i+1) originalAcr True
 			else
-				criterion1Impl originalAcr (ys) [] acrPos (i+1) originalAcr False
+				criterion1Impl originalAcr (ys) [] acrPos (i+1) originalAcr False 
 	else
-		filter (/="") [intercalate " " (reverse buffer)]
+		if (length buffer == length originalAcr) || (length buffer == (length originalAcr)+1) then
+			nub (filter (/="") [intercalate " " (reverse buffer)])
+		else 
+			[] 
 				
 	where 
 		lastChar = last y
 		wordWeirdChar = lastChar == '.' || lastChar == ',' || lastChar == ';' || lastChar == ':'	
+		
 {- criterion1
 Función que obtiene un significado de un acrónimo a partir de un acrónimo una
 lista de palabras.
@@ -403,7 +410,7 @@ criterion3Impl acr@(x:xs) wordsList@(y:ys) buffer positionAcr i =
 		if (isAcronym y) then 
 			criterion3Impl (x:xs) (ys) buffer positionAcr (i+1)  
 		else -- Si la palabra en cuestión no se trata de un acrónimo...
-			if ((partOfWordToLower) == (acrToLower)) && (validWord wordCleanedSafe) then -- Si la palabra tiene el acrónimo como substirng y es válida...
+			if ((partOfWordToLower) == (acrToLower)) && (validWord wordCleanedSafe) && (realAcronym /= wordCleaned) then -- Si la palabra tiene el acrónimo como substirng y es válida...
 				criterion3Impl (x:xs) (ys) (wordCleanedSafe:nextWord:buffer) positionAcr (i+1)
 			else
 				criterion3Impl (x:xs) (ys) buffer positionAcr (i+1)
@@ -419,6 +426,7 @@ criterion3Impl acr@(x:xs) wordsList@(y:ys) buffer positionAcr i =
 		wordCleanedSafe = if wordCleaned == " " then " " else wordCleaned 
 		nextWord = if (ys) == [] then "" else cleanWord (head (ys))
 		
+{- Cuando los caracteres de los acrónioms están desperdigados -}		
 criterion4 :: String->[String]->Int -> [String]
 criterion4 "" _ _ = []
 criterion4 _ [] _ = []
@@ -498,35 +506,14 @@ timesAcronymsImpl :: [Acronym]->[String] -> [(String,Int)]
 timesAcronymsImpl [] _ = []
 timesAcronymsImpl _ [] = []
 timesAcronymsImpl (x:xs) wordsArticle@(y:ys) = 
-					(timesOneAcronym (x) wordsArticle 0)
+					(timesOneAcronym (x) wordsArticle 1)
 					:
 					(timesAcronymsImpl (xs) wordsArticle)
-					
+
+{- Número de veces que aparece un acrónimo -}					
 timesOneAcronym :: Acronym->[String]->Int -> (String,Int)
 timesOneAcronym acr [] i = (minAcronym acr,i)
-timesOneAcronym acr (y:ys) i = if ((minAcronym acr) == y) || ((minAcronym acr) == (cleanWord y)) then
+timesOneAcronym acr (y:ys) i = if ((minAcronym acr) == y) || ((minAcronym acr) == (removeCharsForOperations y)) then
 								timesOneAcronym acr (ys) (i+1)
 							   else
 							   	timesOneAcronym acr (ys) i				
-							  	
-{- Las palabras tienen que ser seguidas. Si hay una que no tiene la siguiente
-letra del acrónimo que toca, se descartan las N últimas palabras analizadas.-}		
-{-				  	
-criterion4Impl2 :: String->[String]->[String]->String->String -> [String]
-criterion4Impl2 acr [] buffer originalAcronym nextWord = [intercalate " " buffer]
-criterion4Impl2 [] wordsList buffer originalAcronym nextWord = (intercalate " " buffer)
-																:
-													  		   (criterion4Impl2 originalAcronym wordsList buffer originalAcronym nextWord)
-criterion4Impl2 acr@(x:xs) wordsList@(y:ys) buffer originalAcronym nextWord = 
-
-	if remainingAcronym /= acr then
-		criterion4Impl2 remainingAcronym (ys) (wordCleanedSafe:buffer) originalAcronym ifFailureStartFromThisWord
-	else
-		criterion4Impl2 originalAcronym (ys) [] originalAcronym nextWord
-	
-	where
-		remainingAcronym = checkWord acr wordCleanedSafe
-		lengthAcronym = length acr			   			  
-		wordCleaned = cleanWord y 
-		wordCleanedSafe = if wordCleaned == " " then " " else wordCleaned	
-		ifFailureStartFromThisWord = if (ys) == [] then "" else cleanWord (head (ys))	-}				  	
