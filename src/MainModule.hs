@@ -15,6 +15,7 @@ main = do
 		putStrLn "Práctica Haskell de Paradigmas de Programación Curso 2015/2016 GIS"
 		putStrLn "------------------------------------------------------------------"
 		putStrLn "Selecciona una opción:"
+		putStrLn "0. Mostrar todos los artículos."
 		putStrLn "1. Mostrar los títulos de los artículos ordenados alfabéticamente y publicados en un año dado."
 		putStrLn "2. Mostrar el listado de revistas en las que se han publicado los artículos de toda la colección."
 		putStrLn "3. Dado un acrónimo, buscarlo en los diferentes artículos y mostrar los títulos de aquellos que contengan el acŕonimo."
@@ -28,7 +29,7 @@ main = do
 		
 		option <- readLn
 		
-		if option > 10 || option < 1 then 
+		if option > 10 || option < 0 then 
 			do
 				putStrLn "Opción elegida incorrecta."
 				putStrLn ""
@@ -37,6 +38,7 @@ main = do
 			case option of
 				0 -> do
 						putStrLn (show articles_list)
+						main
 				1 -> do
 						putStrLn "Introduce un año: "
 						year <- readLn
