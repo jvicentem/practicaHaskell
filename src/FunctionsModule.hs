@@ -81,7 +81,7 @@ articlesFromSource (x:xs) sourceArticles = articlesFromSourceImpl (x:xs) sourceA
 articlesFromSourceImpl :: [Document]->String->[Document] -> [Document]
 articlesFromSourceImpl [] _ buffer = buffer
 articlesFromSourceImpl (x:xs) sourceArticles buffer = if source x == sourceArticles then
-														articlesFromSourceImpl (xs) sourceArticles (x:buffer)
+														articlesFromSourceImpl (xs) sourceArticles (insert (x) buffer)
 												  	  else
 												  		articlesFromSourceImpl (xs) sourceArticles buffer												
 									 
