@@ -9,12 +9,16 @@ data Cluster = Clu { number :: Int,
 					 acronym :: String,
 					 articles :: [(Int,String)]
 					} 
-					
+
+articlesListToString :: [(Int,String)]->[String] -> [String]
+articlesListToString [] buffer = reverse buffer
+articlesListToString ((idArt,titleArt):xs) buffer = articlesListToString (xs) (((show idArt) ++ " - " ++ titleArt):buffer)		
+			
 instance Show Cluster where
 	show (Clu number acronym articles) =
 		show "Cluster " ++ show number ++ "\n" ++
 			  acronym ++ "\n" ++
-			  show articles ++ "\n" ++
+			  unlines (articlesListToString articles []) ++ "\n" ++
 			  "" ++ "\n"
 			  
 instance Eq Cluster where
@@ -55,19 +59,31 @@ articlesToClusters ([],[]) = ( createEmptyCluster , [] )
 articlesToClusters (articlesNoAcronyms,articlesWithAcronyms) = 
 			( Clu {number = 0, acronym = "" ,articles = [((id_document x),(title x))|x<-articlesNoAcronyms]}
 			  , 
-			  reverse (nub (removeRepeatedClusters (splitArticlesWithAcronyms articlesWithAcronyms 1 [])))
+			  countClusters (nub (removeRepeatedClusters (splitArticlesWithAcronyms articlesWithAcronyms [])))
 			)		
-			
+
+{- countClusters:
+Función que asigna un número de clúster a cada clúster.
+-}
+countClusters :: [Cluster] -> [Cluster]
+countClusters [] = []
+countClusters (x:xs) = countClustersImpl (x:xs) 1 []
+
+countClustersImpl :: [Cluster]->Int->[Cluster] -> [Cluster]
+countClustersImpl [] _ buffer = reverse buffer
+countClustersImpl (x:xs) i buffer = countClustersImpl (xs) (i+1) ((Clu {number = i, acronym = (acronym x), articles = (articles x)}):buffer)
+
+
 {- splitArticlesWithAcronyms:
 Función que recibe todos los artículos con acrónimos y crea clústers a partir de
 ellos.
 -}			
-splitArticlesWithAcronyms :: [Document]->Int->[Cluster] -> [Cluster]
-splitArticlesWithAcronyms [] _ [] = []
-splitArticlesWithAcronyms [] _ buffer = buffer
-splitArticlesWithAcronyms (x:xs) i buffer = 
-		    						splitArticlesWithAcronyms (xs) (i+1) ((Clu 
-										{number = i
+splitArticlesWithAcronyms :: [Document]->[Cluster] -> [Cluster]
+splitArticlesWithAcronyms [] [] = []
+splitArticlesWithAcronyms [] buffer = buffer
+splitArticlesWithAcronyms (x:xs) buffer = 
+		    						splitArticlesWithAcronyms (xs) ((Clu 
+										{number = 0
 										, 
 										acronym = (acronymWithMostAppearances (timesAcronyms (acronyms_list x) (content x)) ("",0) 0)
 										, 
