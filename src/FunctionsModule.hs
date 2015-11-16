@@ -2,7 +2,7 @@
 module FunctionsModule (articlesByYear, sourcesOfArticles, articlesWithAcronym, 
 				  		articlesWithSourceAndAcronym, meaningsAcronymsFromYear, 
 				  		acronymsFromId, articlesWithoutAcronyms, articlesFromSource, 
-				  		clusterArticles) where
+				  		clusterArticles, articlesSortedByYear) where
 
 import Data.List
 import DocumentModule (Document(..), existsAcronym, existsAcronymAndSource, noAcronyms)
@@ -117,4 +117,27 @@ articlesFromSourceImpl (x:xs) sourceArticles buffer =
 -- 9
 clusterArticles :: [Document] -> (Cluster,[Cluster])
 clusterArticles [] = (createEmptyCluster,[])
-clusterArticles (x:xs) = groupArticles (x:xs)																										 												 	
+clusterArticles (x:xs) = groupArticles (x:xs)						
+
+-- 10
+articlesSortedByYear :: [Document] -> [(Int,[(Int,String)])]
+articlesSortedByYear [] = []
+articlesSortedByYear (x:xs) = articlesSortedByYearImpl (x:xs) (getListOfYears (x:xs) []) []
+
+articlesSortedByYearImpl :: [Document]->[Int]->[(Int,[(Int,String)])] -> [(Int,[(Int,String)])]
+articlesSortedByYearImpl [] _ _ = []
+articlesSortedByYearImpl _ [] buffer = buffer
+articlesSortedByYearImpl (x:xs) (y:ys) buffer = articlesSortedByYearImpl (x:xs) (ys) ((groupArticlesByYear (x:xs) (y)):buffer)
+
+getListOfYears :: [Document]->[Int] -> [Int]
+getListOfYears [] buffer = nub buffer
+getListOfYears (x:xs) buffer = getListOfYears (xs) (insert (year x) buffer)
+
+groupArticlesByYear :: [Document]->Int -> (Int,[(Int,String)])
+groupArticlesByYear [] _ = (0,[])
+groupArticlesByYear (x:xs) yearArt = (yearArt,[((id_document art),(title art))|art <- (x:xs),(year art) == yearArt])
+
+
+
+
+																			 												 	

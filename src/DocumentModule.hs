@@ -27,8 +27,10 @@ instance Show Document where
 
 instance Eq Document where
 	(Doc source1 id_document1 year1 title1 sections1 abstract1 acronyms_list1 content1) == (Doc source2 id_document2 year2 title2 sections2 abstract2 acronyms_list2 content2) = id_document1 == id_document2
+
 instance Ord Document where
 	(Doc source1 id_document1 year1 title1 sections1 abstract1 acronyms_list1 content1) `compare` (Doc source2 id_document2 year2 title2 sections2 abstract2 acronyms_list2 content2) = title1 `compare` title2
+
 {- existsAcronym:
 Función que devuelve True si existe un acrónimo en ese artículo. False en caso 
 contrario.

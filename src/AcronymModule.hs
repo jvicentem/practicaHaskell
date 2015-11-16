@@ -449,7 +449,7 @@ checkWord (x:xs) (y:ys) = if x == y then
 						  	checkWord (x:xs) (ys) 
 
 {- timesAcronyms:
-Devuelve el número de veces que apareec un acrónimo en un artículo.
+Devuelve el número de veces que aparece un acrónimo en un artículo.
 El segundo argumento es un array y cada posición tiene un String que es 
 cada línea del contenido del artículo.
 -}									

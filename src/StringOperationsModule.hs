@@ -7,10 +7,6 @@ import Data.List
 
 {- removeCharacter:
 Función que elimina un carácter de una lista.
-
-Pondría esta función en StringOperationsModule, pero al importar el módulo
-StringOperationsModule en éste se crea un ciclo, resultando en error de 
-compilación.
 -}
 removeCharacter :: Char->String -> String
 removeCharacter _ [] = []

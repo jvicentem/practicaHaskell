@@ -4,7 +4,7 @@ module MainModule where
 import FunctionsModule (articlesByYear, sourcesOfArticles, articlesWithAcronym, 
 				  articlesWithSourceAndAcronym, meaningsAcronymsFromYear, 
 				  acronymsFromId, articlesWithoutAcronyms, articlesFromSource, 
-				  clusterArticles)
+				  clusterArticles, articlesSortedByYear)
 import IOOperationsModule (readFiles)
 
 articles_list = readFiles "../papersUTF8"
@@ -24,10 +24,11 @@ main = do
 		putStrLn "7. Mostrar los títulos e identificador de todos aquellos artículos que no contengan ningún acrónimo."
 		putStrLn "8. Dado el nombre de una revista, mostrar toda la información de los artículos publicados en dicha revista."
 		putStrLn "9. Agrupar artículos por acrónimos."
+		putStrLn "10. Mostrar artículos (sólo id y título) ordenados cronológicamente (más antiguo a más nuevo)."
 		
 		option <- readLn
 		
-		if option > 9 || option < 1 then 
+		if option > 10 || option < 1 then 
 			do
 				putStrLn "Opción elegida incorrecta."
 				putStrLn ""
@@ -76,4 +77,7 @@ main = do
 						main	
 				9 -> do
 						putStrLn (show (clusterArticles articles_list))		
-						main						
+						main			
+				10 -> do
+						sequence_ $ map print (articlesSortedByYear articles_list)
+						main			
