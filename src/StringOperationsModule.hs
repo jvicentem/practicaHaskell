@@ -12,23 +12,31 @@ Pondría esta función en StringOperationsModule, pero al importar el módulo
 StringOperationsModule en éste se crea un ciclo, resultando en error de 
 compilación.
 -}
-
 removeCharacter :: Char->String -> String
 removeCharacter _ [] = []
-removeCharacter char@_ (x:xs) = if x == char then
-									removeCharacter char (xs)
-								else 
-									x:removeCharacter char (xs)
+removeCharacter char (x:xs) = removeCharacterImpl char (x:xs) []
+
+removeCharacterImpl :: Char->String->String -> String
+removeCharacterImpl _ [] buffer = reverse buffer
+removeCharacterImpl char@_ (x:xs) buffer = if x == char then
+											removeCharacterImpl char (xs) buffer
+										   else 
+											removeCharacterImpl char (xs) (x:buffer)
 
 {- replaceCharacter:
 Función que reemplaza un carácter por otro.
 -}
+
 replaceCharacter :: Char->Char->String -> String
 replaceCharacter _ _ [] = []
-replaceCharacter char1@_ char2@_ (x:xs) = if x == char1 then
-											char2:replaceCharacter char1 char2 (xs)
-										  else 
-											x:replaceCharacter char1 char2 (xs)	
+replaceCharacter char1@_ char2@_ (x:xs) = replaceCharacterImpl char1 char2 (x:xs) []
+
+replaceCharacterImpl :: Char->Char->String->String -> String
+replaceCharacterImpl _ _ [] buffer = reverse buffer
+replaceCharacterImpl char1@_ char2@_ (x:xs) buffer = if x == char1 then
+														replaceCharacterImpl char1 char2 (xs) (char2:buffer)
+										  	  		 else 
+														replaceCharacterImpl char1 char2 (xs)	(x:buffer)
 
 {- deleteByString:
 Función que elimina de una lista de Strings aquellos Strings de esa lista que 

@@ -27,15 +27,15 @@ la información de los archivos que se han leído.
 
 readFiles :: String -> [Document]
 readFiles "" = []
-readFiles (x:xs) = readFilesImpl (getPaths (x:xs))
+readFiles (x:xs) = readFilesImpl (getPaths (x:xs)) []
 
-readFilesImpl :: [FilePath] -> [Document]
-readFilesImpl [] = []
-readFilesImpl (x:xs) = do
-						let text = unsafePerformIO (readEntireFile x)
-						let raw = splitLines text
-						let document = linesToDocument raw
-						document:readFilesImpl xs 
+readFilesImpl :: [FilePath]->[Document] -> [Document]
+readFilesImpl [] buffer = reverse buffer
+readFilesImpl (x:xs) buffer = do
+								let text = unsafePerformIO (readEntireFile x)
+								let raw = splitLines text
+								let document = linesToDocument raw
+								readFilesImpl xs (document:buffer)
 
 {- readEntireFile:
 Función que lee un archivo de texto y devuelve un string con todo el contenido
