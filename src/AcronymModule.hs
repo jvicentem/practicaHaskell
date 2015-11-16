@@ -464,10 +464,10 @@ timesAcronyms (x:xs) (y:ys) = timesAcronymsImpl (x:xs) linesToWords []
 palabra del contenido del artículo.
 -}
 timesAcronymsImpl :: [Acronym]->[String]->[(String,Int)] -> [(String,Int)]
-timesAcronymsImpl [] _ _ = []
-timesAcronymsImpl _ [] buffer = buffer
+timesAcronymsImpl [] _ buffer = buffer
+timesAcronymsImpl _ [] _ = []
 timesAcronymsImpl (x:xs) wordsArticle@(y:ys) buffer = 
-					timesAcronymsImpl (xs) wordsArticle ((timesOneAcronym (x) wordsArticle 1):buffer)
+					timesAcronymsImpl (xs) wordsArticle ((timesOneAcronym (x) wordsArticle 0):buffer)
 
 {- timesOneAcronym:
 Función que devuelve el número de veces que aparece un acrónimo.
