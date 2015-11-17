@@ -27,7 +27,7 @@ sourcesOfArticles [] = []
 sourcesOfArticles (x:xs) = sourcesOfArticlesImpl (x:xs) []
 
 sourcesOfArticlesImpl :: [Document]->[String] -> [String]
-sourcesOfArticlesImpl [] buffer = buffer
+sourcesOfArticlesImpl [] buffer = nub buffer
 sourcesOfArticlesImpl (x:xs) buffer = sourcesOfArticlesImpl (xs) (insert (source x) buffer)
 
 -- 3
@@ -76,7 +76,7 @@ meaningsAcronymsFromYearImpl (x:xs) yearArticle  buffer =
 			meaningsAcronymsFromYearImpl (xs) yearArticle buffer
 
 	   	where
-			string = (title x) ++ " --> " ++ (show (acronyms_list x)) ++ "\n"		
+			string = (title x) ++ " --> " ++ (show (acronyms_list x)) 		
 													
 -- 6
 acronymsFromId :: [Document]->Int -> [(String,Int)]
