@@ -74,20 +74,23 @@ getMeaningForAcronymImpl :: String->[String]->Int -> String
 getMeaningForAcronymImpl _ [] _ = []
 getMeaningForAcronymImpl "" _ _ = []
 getMeaningForAcronymImpl acr@(x:xs) wordsList@(y:ys) positionAcr =
-	if meanings1 /= [] then
-		last meanings1
+	if meanings2 /= [] then
+		last meanings2
 	else
-		if meanings3 /= [] then
-			last meanings3
+		if meanings1 /= [] then
+			last meanings1
 		else
-			if meanings4 /= [] then
-				last meanings4
-			else []
+			if meanings3 /= [] then
+				last meanings3
+			else
+				if meanings4 /= [] then
+					last meanings4
+				else []
 	where
+		meanings2 = criterion2 acr (y:ys) positionAcr
 		meanings1 = criterion1 acr (y:ys) positionAcr
 		meanings3 = criterion3 acr (y:ys) positionAcr
 		meanings4 = criterion4 acr (y:ys) positionAcr
-
 												   				
 {- isAcronym:
 Función que comprueba si un String es un acrónimo o no.
@@ -264,9 +267,6 @@ criterion2Impl "" (y:ys) buffer acrPos i originalAcr = 	if length buffer == leng
 															criterion2Impl originalAcr (y:ys) [] acrPos i originalAcr
 														else 
 															criterion2Impl originalAcr (y:ys) [] acrPos i originalAcr
-
-
-
 criterion2Impl "" [] buffer _ _ originalAcr = if length buffer == length originalAcr then
 												nub (filter (/="") [intercalate " " (reverse buffer)])
 											  else 
@@ -292,46 +292,6 @@ criterion2Impl (x:xs) (y:ys) buffer acrPos i originalAcr =
 	  
 
 -- Las iniciales y una palabra en el medio
-criterion1 :: String->[String]->Int -> [String]
-criterion1 "" _ _ = [""]
-criterion1 _ [] _ = [""]
-criterion1 acronym (x:xs) positionAcr = criterion1Impl acronymCleaned (x:xs) [] positionAcr 0 acronymCleaned False
-											where acronymCleaned = map (\a -> toLower a) (removeCharacter '-' (removeCharsForOperations acronym))
-
-criterion1Impl :: String->[String]->[String]->Int->Int->String->Bool -> [String]
-criterion1Impl "" _ _ _ _ "" _ = []
-criterion1Impl "" (y:ys) buffer acrPos i originalAcr _ = if (length buffer == length originalAcr) || (length buffer == (length originalAcr)+1) then
-															(nub (filter (/="") [intercalate " " (reverse buffer)]))
-															++
-															criterion1Impl originalAcr (y:ys) [] acrPos i originalAcr False
-														 else
-														 	criterion1Impl originalAcr (y:ys) [] acrPos i originalAcr False
-criterion1Impl "" [] buffer _ _ originalAcr _ = if (length buffer == length originalAcr) || (length buffer == (length originalAcr)+1) then
-													nub (filter (/="") [intercalate " " (reverse buffer)])
-									  			else 
-													[]
-criterion1Impl _ [] _ _ _ _ _ = []
-criterion1Impl (x:xs) (y:ys) buffer acrPos i originalAcr alreadyWordInMiddle = 
-	if i < acrPos then
-		if (x == (toLower (head y))) then
-			if not (validWord y) then
-				criterion1Impl (xs) (ys) (y:buffer) acrPos (i+1) originalAcr alreadyWordInMiddle
-			else
-				if (length (x:xs) == 1) then
-					criterion1Impl (xs) (ys) (y:buffer) acrPos (i+1) originalAcr alreadyWordInMiddle
-				else
-					criterion1Impl originalAcr (ys) [] acrPos (i+1) originalAcr False 
-		else
-			if (not alreadyWordInMiddle) && (not (validWord y)) && (length buffer >= 1) then
-				criterion1Impl (x:xs) (ys) (y:buffer) acrPos (i+1) originalAcr True
-			else
-				criterion1Impl originalAcr (ys) [] acrPos (i+1) originalAcr False 
-	else
-		if (length buffer == length originalAcr) || (length buffer == (length originalAcr)+1) then
-			nub (filter (/="") [intercalate " " (reverse buffer)])
-		else 
-			[] 	
-		
 {- criterion1
 Función que obtiene un significado de un acrónimo a partir de un acrónimo una
 lista de palabras.
@@ -352,7 +312,52 @@ al acrónimo.
 - Una parámetro de entrada booleano que sirve para indicar si ya hay una palabra
 en el medio o no. Inicialmente vale False.
 -}
+criterion1 :: String->[String]->Int -> [String]
+criterion1 "" _ _ = [""]
+criterion1 _ [] _ = [""]
+criterion1 acronym (x:xs) positionAcr = criterion1Impl acronymCleaned (x:xs) [] positionAcr 0 acronymCleaned False
+											where acronymCleaned = map (\a -> toLower a) (removeCharacter '-' (removeCharsForOperations acronym))
 
+criterion1Impl :: String->[String]->[String]->Int->Int->String->Bool -> [String]
+criterion1Impl "" _ _ _ _ "" _ = []
+criterion1Impl "" (y:ys) buffer acrPos i originalAcr _ = if (length buffer == length originalAcr) || (length buffer == (length originalAcr)+1) then
+															if (length buffer == (length originalAcr)+1) && (((reverse buffer)!!0)!!0 == ((reverse buffer)!!1)!!0) then
+																(nub (filter (/="") [intercalate " " (tail (reverse buffer)) ]))
+																++
+																criterion1Impl originalAcr (y:ys) [] acrPos i originalAcr False																
+															else
+																(nub (filter (/="") [intercalate " " (reverse buffer)]))
+																++
+																criterion1Impl originalAcr (y:ys) [] acrPos i originalAcr False
+														 else
+														 	criterion1Impl originalAcr (y:ys) [] acrPos i originalAcr False
+criterion1Impl "" [] buffer _ _ originalAcr _ = if (length buffer == length originalAcr) || (length buffer == (length originalAcr)+1) then
+													nub (filter (/="") [intercalate " " (reverse buffer)])
+									  			else 
+													[]
+criterion1Impl _ [] _ _ _ _ _ = []
+criterion1Impl (x:xs) (y:ys) buffer acrPos i originalAcr alreadyWordInMiddle = 
+	if i < acrPos then
+		if (x == (toLower (head y))) then
+			if validWord y then
+				criterion1Impl (xs) (ys) (y:buffer) acrPos (i+1) originalAcr alreadyWordInMiddle
+			else
+				if (length (x:xs) == 1) then
+					criterion1Impl (xs) (ys) (y:buffer) acrPos (i+1) originalAcr alreadyWordInMiddle
+				else
+					criterion1Impl originalAcr (ys) [] acrPos (i+1) originalAcr False 
+		else
+			if (not alreadyWordInMiddle) && (validWord y) && (length buffer >= 1) then
+				criterion1Impl (x:xs) (ys) (y:buffer) acrPos (i+1) originalAcr True
+			else
+				criterion1Impl originalAcr (ys) [] acrPos (i+1) originalAcr False 
+	else
+		if (length buffer == length originalAcr) || (length buffer == (length originalAcr)+1) then
+			nub (filter (/="") [intercalate " " (reverse buffer)])
+		else 
+			[] 
+
+{-Cuando el acrónimo está formado por caracteres de una misma palara más la palabra siguiente-}
 criterion3 :: String->[String]->Int -> [String]
 criterion3 "" _ _ = [""]
 criterion3 _ [] _ = [""]
