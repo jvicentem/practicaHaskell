@@ -36,9 +36,11 @@ del artículo.
 getAcronymsWithMeaning :: [String] -> [Acronym]
 getAcronymsWithMeaning [] = []
 getAcronymsWithMeaning (x:xs) =  nub (
-									(getAcronymsWithMeaningImpl lineToWords 0 lineToWords [])
-									++
-									(getAcronymsWithMeaning (xs))
+										(abstractAcronyms lineToWords)
+										++
+										(getAcronymsWithMeaningImpl lineToWords 0 lineToWords [])
+										++
+										(getAcronymsWithMeaning (xs))
 						   		 )
 						   		
 						   		 where lineToWords = words x
@@ -483,3 +485,26 @@ timesOneAcronym acr (y:ys) i = if ((minAcronym acr) == y) || ((minAcronym acr) =
 								timesOneAcronym acr (ys) (i+1)
 							   else
 							   	timesOneAcronym acr (ys) i				
+
+{- abstractAcronyms:
+Función que detecta aquellos acrónimos y sus formas expandidas que vienen
+explícitamente en el apartado abstract.
+-}
+abstractAcronyms :: [String] -> [Acronym]
+abstractAcronyms [] = []
+abstractAcronyms wordsList@(x:xs) = if (x) == "Abbreviations:" then
+										abstractAcronymsImpl (xs) [] []
+						  			else
+						  				[]
+						  	 
+abstractAcronymsImpl :: [String]->[String]->[Acronym] -> [Acronym]
+abstractAcronymsImpl [] buffer bufferAcr = bufferAcr
+abstractAcronymsImpl (x:xs) buffer bufferAcr = if x /= "=" then
+												if last x == '.' || last x == ',' then
+													abstractAcronymsImpl (xs) [] (Acr {minAcronym = head (reverse buffer) , maxAcronym = intercalate " " ((tail(reverse buffer))++[lastWord])}:bufferAcr)
+												else 
+													abstractAcronymsImpl (xs) (x:buffer) bufferAcr
+											   else
+											   	abstractAcronymsImpl (xs) buffer bufferAcr
+											   	
+											   where lastWord = init x
