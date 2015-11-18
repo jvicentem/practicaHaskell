@@ -79,6 +79,8 @@ main = do
 						putStrLn (show (articlesFromSource articles_list source))		
 						main	
 				9 -> do
+						putStrLn "Procesando, espere un momento por favor..."
+						putStrLn ""
 						putStrLn (show (clusterArticles articles_list))		
 						main			
 				10 -> do
