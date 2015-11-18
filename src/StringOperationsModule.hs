@@ -1,9 +1,77 @@
 
-module StringOperationsModule (splitLines,linesToDocument,getContent) where
+module StringOperationsModule (splitLines, getContent, getSource, getIdDocument, 
+								getYear, getTitle, getAbstract, getSections, 
+								removeCharacter, replaceCharacter) where
 
 import Data.List
-import DocumentModule (Document(..))
-import AcronymModule (Acronym(..),getListOfAcronyms)
+
+{- removeCharacter:
+Función que elimina un carácter de una lista.
+-}
+removeCharacter :: Char->String -> String
+removeCharacter _ [] = []
+removeCharacter char (x:xs) = removeCharacterImpl char (x:xs) []
+
+removeCharacterImpl :: Char->String->String -> String
+removeCharacterImpl _ [] buffer = reverse buffer
+removeCharacterImpl char@_ (x:xs) buffer = if x == char then
+											removeCharacterImpl char (xs) buffer
+										   else 
+											removeCharacterImpl char (xs) (x:buffer)
+
+{- replaceCharacter:
+Función que reemplaza un carácter por otro.
+-}
+
+replaceCharacter :: Char->Char->String -> String
+replaceCharacter _ _ [] = []
+replaceCharacter char1@_ char2@_ (x:xs) = replaceCharacterImpl char1 char2 (x:xs) []
+
+replaceCharacterImpl :: Char->Char->String->String -> String
+replaceCharacterImpl _ _ [] buffer = reverse buffer
+replaceCharacterImpl char1@_ char2@_ (x:xs) buffer = if x == char1 then
+														replaceCharacterImpl char1 char2 (xs) (char2:buffer)
+										  	  		 else 
+														replaceCharacterImpl char1 char2 (xs)	(x:buffer)
+
+{- deleteByString:
+Función que elimina de una lista de Strings aquellos Strings de esa lista que 
+son iguales a uno que se le pasa como parámetro de entrada.
+-}
+deleteByString :: String->[String]->[String] -> [String]
+deleteByString _ [] [] = []
+deleteByString string [x] (z:zs) = if x == string then 
+									 reverse (drop 1 (z:zs)) 
+								   else reverse (drop 1 (x:(z:zs)))
+deleteByString string (x:(y:ys)) buffer = if x == string then 
+											deleteByString string (y:ys) buffer
+										  else
+							   				deleteByString string (y:ys) (x:buffer)																 
+deleteByString _ [""] _ = []
+
+{- splitLines:
+Función que coloca cada línea precedida de un salto de línea en una posición de
+una lista de Strings.
+ -}
+splitLines :: String -> [String]
+splitLines "" = [""]
+splitLines (x:xs) = lines (x:xs)
+
+{- stringToInt:
+Función que convierte un String en Int.
+ -}
+stringToInt :: String -> Int
+stringToInt "" = -1
+stringToInt (x:xs) = read (x:xs) :: Int
+
+{- convertLineToInt:
+Función que convierte un String dentro de una lista de Strings a Int. 
+Como segundo parámetro de la función se le pasa un número que será la posición
+que ocupa la línea que se desea convertir dentro de la lista.
+ -}
+convertLineToInt :: [String]->Int -> Int
+convertLineToInt [] _ = -1
+convertLineToInt (x:(y:ys)) i = stringToInt ((x:(y:ys)) !! i)
 
 {- getSource:
 Función que obtiene el nombre de la revista en la que está publicado el artículo.
@@ -77,77 +145,13 @@ Se eliminan los siete primeros elementos de la lista de Strings que se pasa como
 primer argumento a la función porque todas esas líneas anteriores ya han sido 
 tratadas por otras funciones ya que contienen información distinta a la referente
 a las secciones.
-
 Esta función está para que se pueda analizar el contenido del artículo y 
 encontrar acrónimos y sus formas expandidas.
 -}
 getContent :: [String] -> [String]
 getContent [] = []
-getContent (x:(y:ys)) = deleteSectionsTitles ( getLinesBetweenDashes (drop 7 (x:(y:ys))) ) ++ [getTitle (x:(y:ys))] ++ [getAbstract (x:(y:ys))] 
-
-{- getAcronyms:
-Función que obtiene todos los acrónimos de un artículo.
-
-Realmente, devuelve una lista de tipos Acronym y cada tipo Acronym contiene el
-acrónimo y su forma expandida.
--}
-getAcronyms :: [String] -> [Acronym]
-getAcronyms [] = []
-getAcronyms (x:xs) = getListOfAcronyms (getContent (x:xs))
-
-{-linesToDocument:
-Función que almacena los Strings que están en una lista en un tipo Document.
-
-Esa lista de Strings, al igual que en otras funciones, contendrá la información
-de un artículo. Cada String de la lista será una línea de un archivo de texto de
-un artículo (si es que previamente la lista con Strings no ha sido tratada por
-otra función).
--}
-linesToDocument :: [String] -> Document
-linesToDocument [] = Doc {
-					  source = "",
-					  id_document = -1, 
-					  year = -1,
-					  title = "",
-					  sections = [], 
-					  abstract = "",
-					  acronyms_list = [],
-					  content = []
-					 }								   	
-linesToDocument (x:xs) = Doc {
-						  source = getSource (x:xs),
-					  	  id_document = getIdDocument (x:xs), 
-					  	  year = getYear (x:xs),
-					  	  title = getTitle (x:xs),
-					  	  sections = getSections (x:xs), 
-					  	  abstract = getAbstract (x:xs),
-					  	  acronyms_list = getAcronyms (x:xs), -- Dentro del getAcronyms usaré el getContent
-					  	  content = getContent (x:xs)
-					  	 }			
-
-{- splitLines:
-Función que coloca cada línea precedida de un salto de línea en una posición de
-una lista de Strings.
- -}
-splitLines :: String -> [String]
-splitLines "" = [""]
-splitLines (x:xs) = lines (x:xs)
-
-{- stringToInt:
-Función que convierte un String en Int.
- -}
-stringToInt :: String -> Int
-stringToInt "" = -1
-stringToInt (x:xs) = read (x:xs) :: Int
-
-{- convertLineToInt:
-Función que convierte un String dentro de una lista de Strings a Int. 
-Como segundo parámetro de la función se le pasa un número que será la posición
-que ocupa la línea que se desea convertir dentro de la lista.
- -}
-convertLineToInt :: [String]->Int -> Int
-convertLineToInt [] _ = -1
-convertLineToInt (x:(y:ys)) i = stringToInt ((x:(y:ys)) !! i)
+getContent (x:(y:ys)) = deleteSectionsTitles ( getLinesBetweenDashes (drop 7 (x:(y:ys))) ) 
+							++ [getTitle (x:(y:ys))] ++ [getAbstract (x:(y:ys))] 
 
 {- getLinesBetweenDashes:
 Función que extrae las líneas de texto que se encuentran entre guiones (--).
@@ -157,21 +161,6 @@ String "--".
 getLinesBetweenDashes :: [String] -> [String]
 getLinesBetweenDashes [] = []
 getLinesBetweenDashes (x:(y:ys)) = deleteByString "--" (x:(y:ys)) []
-
-{- deleteByString:
-Función que elimina de una lista de Strings aquellos Strings de esa lista que 
-son iguales a uno que se le pasa como parámetro de entrada.
--}
-deleteByString :: String->[String]->[String] -> [String]
-deleteByString _ [] [] = []
-deleteByString string [x] (z:zs) = if x == string then 
-									 reverse (drop 1 (z:zs)) 
-								   else reverse (drop 1 (x:(z:zs)))
-deleteByString string (x:(y:ys)) buffer = if x == string then 
-											deleteByString string (y:ys) buffer
-										  else
-							   				deleteByString string (y:ys) (x:buffer)																 
-deleteByString _ [""] _ = []
 
 {- deleteContentSections:
 Función que elimina el contenido de las secciones.
@@ -201,4 +190,4 @@ deleteSectionsTitlesImpl (x:xs) i buffer = if odd i then
 									 	   else
 											deleteSectionsTitlesImpl xs (i+1) buffer
 											
-				  	 
+			  	 

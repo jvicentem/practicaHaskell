@@ -5,8 +5,8 @@ import System.IO.Unsafe
 import System.IO.Error
 import System.Directory
 import System.FilePath
-import StringOperationsModule (splitLines,linesToDocument,getContent)
-import DocumentModule (Document(..))
+import StringOperationsModule (splitLines, getContent)
+import DocumentModule (Document(..), linesToDocument)
 
 handler :: IOError -> IO String
 handler e  = if isDoesNotExistError e then
@@ -21,22 +21,21 @@ handler e  = if isDoesNotExistError e then
 {- readFiles:
 Función que lee todos los archivos de texto incluidos en el directorio que se 
 pasa como primer parámetro de entrada.
-
 Como salida, devolverá una lista con tipos Document y cada uno tendrá la 
 la información de los archivos que se han leído.
 -}
 
 readFiles :: String -> [Document]
 readFiles "" = []
-readFiles (x:xs) = readFilesImpl (getPaths (x:xs))
+readFiles (x:xs) = readFilesImpl (getPaths (x:xs)) []
 
-readFilesImpl :: [FilePath] -> [Document]
-readFilesImpl [] = []
-readFilesImpl (x:xs) = do
-						let text = unsafePerformIO (readEntireFile x)
-						let raw = splitLines text
-						let document = linesToDocument raw
-						document:readFilesImpl xs 
+readFilesImpl :: [FilePath]->[Document] -> [Document]
+readFilesImpl [] buffer = reverse buffer
+readFilesImpl (x:xs) buffer = do
+								let text = unsafePerformIO (readEntireFile x)
+								let raw = splitLines text
+								let document = linesToDocument raw
+								readFilesImpl xs (document:buffer)
 
 {- readEntireFile:
 Función que lee un archivo de texto y devuelve un string con todo el contenido
@@ -45,7 +44,7 @@ del mismo.
 readEntireFile :: String -> IO String
 readEntireFile directory = catchIOError (readFile directory) handler
 
-{- getPaths
+{- getPaths:
 A partir de un path de una carpeta, obtiene todas las rutas de archivos
 contenidos en ella.
 -}
