@@ -183,10 +183,6 @@ isIndex (x:xs) = (x:xs) == "I" || (x:xs) == "II" || (x:xs) == "III"
 	 
 {- cleanWord:
 Función que elimina de una palabra ciertos caracteres.
-
-Pondría esta función en StringOperationsModule, pero al importar el módulo
-StringOperationsModule en éste se crea un ciclo, resultando en error de 
-compilación.
 -}									
 cleanWord :: String -> String
 cleanWord [] = []
