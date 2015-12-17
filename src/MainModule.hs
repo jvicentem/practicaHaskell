@@ -7,7 +7,7 @@ import FunctionsModule (articlesByYear, sourcesOfArticles, articlesWithAcronym,
 				  clusterArticles, articlesSortedByYear)
 import IOOperationsModule (readFiles)
 
-articles_list = readFiles "../papersUTF8prueba"
+articles_list = readFiles "../papersUTF8"
 
 main :: IO ()
 main = do
